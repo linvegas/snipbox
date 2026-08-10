@@ -6,6 +6,7 @@ import (
 	"flag"
 	"net/http"
 	"database/sql"
+	"html/template"
 
 	"snipbox/internal/models"
 
@@ -29,10 +30,17 @@ func main() {
 
 	defer db.Close()
 
+	tplCache, err := newTemplateCache()
+
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
 	app := &application{
 		errorLog: errorLog,
 		infoLog: infoLog,
 		snippets: &models.SnippetModel{DB: db},
+		templateCache: tplCache,
 	}
 
 	srv := &http.Server{
@@ -51,6 +59,7 @@ type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
 	snippets *models.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 func openDB(dsn string) (*sql.DB, error) {

@@ -1,8 +1,12 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
 
-func (app *application) routes() *http.ServeMux {
+	"snipbox/internal/chains"
+)
+
+func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
@@ -13,5 +17,7 @@ func (app *application) routes() *http.ServeMux {
 	mux.HandleFunc("/snippet/view", app.snippetView)
 	mux.HandleFunc("POST /snippet/create", app.snippetCreate)
 
-	return mux
+	standard := chains.New(app.recoverPanic, app.logRequest, secureHearders)
+
+	return standard.Then(mux)
 }

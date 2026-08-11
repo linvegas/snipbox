@@ -23,6 +23,10 @@ func (app *application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
 }
 
+func (app *application) methodNotAllowed(w http.ResponseWriter, r *http.Request) {
+	app.clientError(w, http.StatusMethodNotAllowed)
+}
+
 func (app *application) newTemplateData(r *http.Request) *templateData {
 	return &templateData{
 		CurrentYear: time.Now().Year(),
